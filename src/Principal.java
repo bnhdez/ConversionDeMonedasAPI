@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.Scanner;
 
 public class Principal {
@@ -75,10 +76,20 @@ public class Principal {
                 monto = lectura.nextDouble();
 
                 if (monto > 0){
-                    Moneda moneda = consulta.buscaMoneda(origenMoneda, destinoMoneda, monto);
-                    System.out.println("El valor de " + monto +
-                            " [" + origenMoneda + "] equivale a " + moneda.conversion_result() +
-                            " [" + destinoMoneda + "]");
+                    try {
+                        Moneda consultaConversion = consulta.buscaMoneda(origenMoneda, destinoMoneda, monto);
+                        System.out.println("El valor de " + monto +
+                                " [" + origenMoneda + "] equivale a " + consultaConversion.conversion_result() +
+                                " [" + destinoMoneda + "]");
+
+                        GeneradorJson generador = new GeneradorJson();
+                        generador.guardarArchivo(consultaConversion, origenMoneda, destinoMoneda);
+                    }catch (NumberFormatException e){
+                        System.out.println("Error, número no encontrado: " + e.getMessage());
+                    } catch (IOException e) {
+                        System.out.println("Error al grabar datos a JSON " + e.getMessage());
+                        throw new RuntimeException(e);
+                    }
                 } else {
                     System.out.println("Por favor, ingrese un monto mayor a 0");
                 }
